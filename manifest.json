@@ -1,0 +1,15 @@
+{
+  "name": "G-phone — Jewelry OS 1",
+  "short_name": "Jewelry OS",
+  "description": "A jewelry-themed phone UI simulator/prototype shell for the G-phone.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F1E7",
+  "theme_color": "#F6F1E7",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>G-phone — Jewelry OS 1</title>
+<meta name="theme-color" content="#F6F1E7">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Jewelry OS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EDE6DC;
+    --pearl-top: #F6F1E7;
+    --pearl-bottom: #EFDCD6;
+    --ink: #2B2620;
+    --ink-soft: #6E6559;
+    --gold: #C6A15B;
+    --gold-dark: #A0813A;
+    --card: #FFFFFF;
+    --card-dark: #1C1A17;
+    --line: rgba(43,38,32,0.10);
+    --radius-lg: 34px;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Jost', 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #1a1712;
+    font-family: var(--font-body);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at 30% 15%, rgba(198,161,91,0.10), transparent 45%),
+      #1a1712;
+  }
+
+  /* ---------- PHONE FRAME ---------- */
+  #device {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 430px;
+    max-height: 932px;
+    aspect-ratio: 430 / 932;
+    background: #0f0d0a;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow:
+      0 0 0 8px #0f0d0a,
+      0 0 0 10px var(--gold-dark),
+      0 40px 90px -20px rgba(0,0,0,0.65);
+  }
+  @media (min-width: 460px) and (min-height: 960px) {
+    #device { width: 400px; height: 866px; }
+  }
+
+  #screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--wallpaper, linear-gradient(165deg, var(--pearl-top), var(--pearl-bottom)));
+  }
+
+  /* ---------- STATUS BAR ---------- */
+  #statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px 2px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0.5px;
+    color: var(--ink);
+    z-index: 40;
+    position: relative;
+  }
+  #statusbar .left { opacity: 0.85; cursor: pointer; }
+  #statusbar .right { display: flex; align-items: center; gap: 9px; }
+  #statusbar svg { display: block; }
+
+  /* ---------- NAV ROW (sensor / home / brand mark) ---------- */
+  #navrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 26px 10px;
+    z-index: 40;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+  #sensor {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #3a352c, #0f0d0a 70%);
+    box-shadow: 0 0 0 2px var(--gold-dark), inset 0 0 4px rgba(0,0,0,0.6);
+    cursor: pointer;
+  }
+  #homebtn {
+    width: 34px; height: 34px;
+    border-radius: 11px;
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(43,38,32,0.12);
+    cursor: pointer;
+  }
+  #homebtn svg { width: 17px; height: 17px; }
+  #brandmark {
+    width: 34px; height: 34px;
+    cursor: pointer;
+  }
+
+  /* ---------- HOME SCREEN ---------- */
+  #home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 22px 0;
+    position: relative;
+    z-index: 20;
+    overflow-y: auto;
+  }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), 1fr);
+    gap: 22px 12px;
+    flex: 1;
+    align-content: start;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    position: relative;
+    transition: transform 0.12s ease;
+  }
+  .app.wiggle { animation: wiggle 0.28s ease-in-out infinite; }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-1.3deg); }
+    50% { transform: rotate(1.3deg); }
+  }
+  .app:active { transform: scale(0.92); }
+
+  .app .icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: var(--icon-bg, var(--card));
+    color: var(--icon-fg, var(--gold-dark));
+    box-shadow: 0 6px 14px rgba(43,38,32,0.16), inset 0 0 0 1px rgba(43,38,32,0.05);
+  }
+  .app .label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink);
+    max-width: 68px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .app .remove {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #B5484A;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+  .app.wiggle .remove { display: flex; }
+
+  .app.add-app .icon {
+    background: transparent;
+    border: 1.5px dashed rgba(43,38,32,0.28);
+    color: var(--ink-soft);
+  }
+
+  /* ---------- DOCK ---------- */
+  #dock {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 10px calc(env(safe-area-inset-bottom, 10px) + 10px);
+    margin: 8px -6px 0;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(20px);
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+  #dock .app .label { display: none; }
+
+  #home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    border-radius: 3px;
+    background: rgba(43,38,32,0.35);
+    z-index: 60;
+  }
+
+  /* ---------- APP DETAIL VIEW ---------- */
+  #appview {
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    background: var(--pearl-top);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(.2,.8,.2,1);
+  }
+  #appview.open { transform: translateY(0); }
+  #appview header {
+    padding: 54px 24px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  #appview header .icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--card);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--gold-dark); font-weight: 700;
+    box-shadow: 0 2px 8px rgba(43,38,32,0.12);
+  }
+  #appview header h2 { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 600; }
+  #appview .body {
+    flex: 1;
+    padding: 24px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-y: auto;
+  }
+  #appview .close {
+    position: absolute;
+    top: 54px; right: 20px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--ink);
+    border: none;
+    font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(43,38,32,0.12);
+  }
+
+  /* ---------- PROFILE / ABOUT PANEL (brand mark) ---------- */
+  #about {
+    position: absolute;
+    inset: 0;
+    z-index: 80;
+    background: rgba(26,23,18,0.4);
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  #about.open { opacity: 1; pointer-events: auto; }
+  #about .sheet {
+    background: var(--pearl-top);
+    width: 100%;
+    border-radius: 26px 26px 0 0;
+    padding: 28px 26px 40px;
+    text-align: center;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+  }
+  #about.open .sheet { transform: translateY(0); }
+  #about .mark { width: 46px; height: 46px; margin: 0 auto 12px; }
+  #about h3 { font-family: var(--font-display); margin: 0 0 4px; font-size: 20px; }
+  #about p { margin: 0; color: var(--ink-soft); font-size: 13px; }
+
+  /* ---------- LOCK / SLEEP OVERLAY (tap sensor) ---------- */
+  #lock {
+    position: absolute;
+    inset: 0;
+    z-index: 90;
+    background: linear-gradient(165deg, var(--pearl-top), var(--pearl-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+  }
+  #lock.closed { transform: translateY(0); }
+  #lock .clock-big { font-family: var(--font-display); font-size: 64px; font-weight: 600; color: var(--ink); }
+  #lock .date-big { font-size: 12.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px; }
+  #lock .hint { margin-top: 40px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); }
+
+  /* ---------- SETTINGS DRAWER ---------- */
+  #settings-toggle {
+    position: fixed;
+    top: 16px;
+    right: calc(50% - 215px - 46px);
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid rgba(0,0,0,0.08);
+    color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    font-size: 15px;
+  }
+  @media (max-width: 900px) { #settings-toggle { display: none; } }
+
+  #settings {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100%;
+    width: 320px;
+    max-width: 90vw;
+    background: #FBF8F2;
+    border-left: 1px solid rgba(0,0,0,0.08);
+    z-index: 300;
+    padding: 26px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    font-family: var(--font-body);
+    color: var(--ink);
+  }
+  #settings.open { transform: translateX(0); }
+  #settings h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin: 24px 0 10px; font-weight: 600; }
+  #settings h3:first-child { margin-top: 0; }
+  #settings label { font-size: 13px; color: var(--ink); display:block; margin-bottom: 6px; }
+  #settings input[type=text] {
+    width: 100%; padding: 9px 10px; border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: #fff; color: var(--ink);
+    font-family: var(--font-body); font-size: 13px;
+    margin-bottom: 10px;
+  }
+  #settings input[type=color] {
+    width: 40px; height: 30px; border: none; border-radius: 8px; background: none; cursor: pointer;
+  }
+  .swatch-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px;}
+  .swatch-row span { font-size: 12.5px; color: var(--ink-soft); }
+  #settings select {
+    width: 100%; padding: 8px; border-radius: 10px;
+    background: #fff; color: var(--ink);
+    border: 1px solid rgba(0,0,0,0.12);
+    font-family: var(--font-body); font-size: 13px;
+    margin-bottom: 10px;
+  }
+  #settings button.primary {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: var(--gold);
+    color: #2B2013;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  #settings .hint {
+    font-size: 11.5px; color: var(--ink-soft); line-height: 1.5; margin-top: 4px;
+  }
+  #settings-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none; border: none; color: var(--ink-soft); font-size: 18px; cursor: pointer;
+  }
+  #install-btn { display: none; }
+</style>
+</head>
+<body>
+
+<button id="settings-toggle" title="Customize">⚙</button>
+
+<div id="device">
+  <div id="screen">
+
+    <div id="statusbar">
+      <span class="left" id="clock-link">9:41</span>
+      <div class="right">
+        <!-- battery -->
+        <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="1" y="1" width="17" height="9" rx="2.5" stroke="#2B2620" stroke-width="1"/><rect x="2.5" y="2.5" width="12" height="6" rx="1" fill="#2B2620"/><rect x="19" y="3.5" width="2" height="4" rx="1" fill="#2B2620"/></svg>
+        <!-- wifi -->
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M7.5 9.2a1 1 0 100 2 1 1 0 000-2z" fill="#2B2620"/><path d="M4.2 6.6a4.7 4.7 0 016.6 0" stroke="#2B2620" stroke-width="1.3" stroke-linecap="round"/><path d="M1.5 4a8.5 8.5 0 0112 0" stroke="#2B2620" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <!-- fingerprint -->
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 00-10 10c0 2 .4 3.6 1 5M12 2a10 10 0 0110 10c0 1.3-.1 2.3-.4 3.3M7 20a15 15 0 01-1.4-4.6M17 19.8a15 15 0 001-4.3M12 6a6 6 0 00-6 6c0 1.8.3 3 .8 4M12 6a6 6 0 016 6c0 1-.1 2-.4 3M12 10a2 2 0 00-2 2c0 2.5.6 4.3 1.3 5.7M12 10a2 2 0 012 2c0 1.7-.2 3-.6 4.2" stroke="#2B2620" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <!-- volume -->
+        <svg width="15" height="13" viewBox="0 0 24 22" fill="none"><path d="M3 8h4l5-4v16l-5-4H3z" fill="#2B2620"/><path d="M16 7a6 6 0 010 8M19 4a10.5 10.5 0 010 14" stroke="#2B2620" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div id="navrow">
+      <div id="sensor" title="Lock"></div>
+      <div id="homebtn" title="Home">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="#2B7A4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h5v-5.5h2V19h5v-9" stroke="#2B7A4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <svg id="brandmark" viewBox="0 0 100 100" title="About">
+        <g>
+          <polygon points="50,20 68,42 50,64 32,42" fill="#B58ACB" opacity="0.9"/>
+          <polygon points="50,36 66,54 50,72 34,54" fill="#8ACBAE" opacity="0.85"/>
+          <polygon points="34,28 50,50 34,72 18,50" fill="#E0B84F" opacity="0.85"/>
+          <polygon points="66,28 82,50 66,72 50,50" fill="#E08A8A" opacity="0.85"/>
+          <circle cx="50" cy="50" r="8" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+
+    <div id="home">
+      <div id="grid"></div>
+    </div>
+
+    <div id="dock"></div>
+    <div id="home-indicator"></div>
+
+    <div id="appview">
+      <button class="close" id="appview-close">✕</button>
+      <header>
+        <div class="icon" id="appview-icon">A</div>
+        <h2 id="appview-title">App</h2>
+      </header>
+      <div class="body" id="appview-body"></div>
+    </div>
+
+    <div id="about">
+      <div class="sheet">
+        <svg class="mark" viewBox="0 0 100 100">
+          <polygon points="50,20 68,42 50,64 32,42" fill="#B58ACB"/>
+          <polygon points="50,36 66,54 50,72 34,54" fill="#8ACBAE"/>
+          <polygon points="34,28 50,50 34,72 18,50" fill="#E0B84F"/>
+          <polygon points="66,28 82,50 66,72 50,50" fill="#E08A8A"/>
+          <circle cx="50" cy="50" r="8" fill="#fff"/>
+        </svg>
+        <h3>G-phone</h3>
+        <p>Jewelry OS 1</p>
+      </div>
+    </div>
+
+    <div id="lock">
+      <div class="clock-big" id="lock-clock">9:41</div>
+      <div class="date-big" id="lock-date">MON · JUL 20</div>
+      <div class="hint">tap the sensor to unlock</div>
+    </div>
+
+  </div>
+</div>
+
+<div id="settings">
+  <button id="settings-close">✕</button>
+  <h3>Appearance</h3>
+  <div class="swatch-row"><span>Accent (gold)</span><input type="color" id="accent-color" value="#C6A15B"></div>
+  <div class="swatch-row"><span>Wallpaper (top)</span><input type="color" id="wall-top" value="#F6F1E7"></div>
+  <div class="swatch-row"><span>Wallpaper (bottom)</span><input type="color" id="wall-bottom" value="#EFDCD6"></div>
+  <label>Grid columns</label>
+  <select id="cols-select">
+    <option value="3">3</option>
+    <option value="4" selected>4</option>
+    <option value="5">5</option>
+  </select>
+
+  <h3>Apps</h3>
+  <label>App name</label>
+  <input type="text" id="new-app-name" placeholder="e.g. Appraiser">
+  <label>Icon letter / emoji</label>
+  <input type="text" id="new-app-icon" placeholder="e.g. 💍" maxlength="4">
+  <button class="primary" id="add-app-btn">Add app to home screen</button>
+  <div class="hint">Long-press any icon on the home screen to enter edit mode and remove apps.</div>
+
+  <h3>Device data</h3>
+  <button class="primary" id="reset-btn" style="background:#fff; color:var(--ink); border:1px solid rgba(0,0,0,0.12);">Reset to defaults</button>
+
+  <h3>Install</h3>
+  <div class="hint" id="install-hint">
+    Deploy this to GitHub Pages, then open the link on your phone's browser and use "Add to Home Screen" to install G-phone as a real app icon.
+  </div>
+  <button class="primary" id="install-btn">Install now</button>
+</div>
+
+<script>
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+
+  const DEFAULT_APPS = [
+    { id:'catalog', name:'Catalog',  icon:'💎', dock:true,  color:'#A0813A' },
+    { id:'phone',   name:'Phone',    icon:'📞', dock:true,  color:'#2B7A4B' },
+    { id:'mail',    name:'Mail',     icon:'✉️', dock:true,  color:'#4A6FA5' },
+    { id:'messages',name:'Messages', icon:'💬', dock:true,  color:'#4A9E8F' },
+
+    { id:'shop',      name:'Shop',      icon:'🛍️', color:'#8A6FA5' },
+    { id:'browser',   name:'Browser',   icon:'🧭', color:'#4A9EA5' },
+    { id:'files',     name:'Files',     icon:'📁', color:'#B08A4A' },
+    { id:'design',    name:'Design',    icon:'🎨', color:'#B5484A' },
+    { id:'news',      name:'News',      icon:'📰', color:'#2B2620' },
+    { id:'contacts',  name:'Contacts',  icon:'👤', color:'#6E6559' },
+    { id:'translate', name:'Translate', icon:'🌐', color:'#4A6FA5' },
+    { id:'voice',     name:'Voice Memo',icon:'🎙️', color:'#B5484A' },
+  ];
+
+  const STATE_KEY = 'gphoneJewelryOsState_v1';
+
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      apps: DEFAULT_APPS,
+      accent: '#C6A15B',
+      wallTop: '#F6F1E7',
+      wallBottom: '#EFDCD6',
+      cols: 4
+    };
+  }
+  function saveState(){ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+
+  let state = loadState();
+  let editMode = false;
+
+  function applyTheme(){
+    document.documentElement.style.setProperty('--gold', state.accent);
+    document.documentElement.style.setProperty('--wallpaper', `linear-gradient(165deg, ${state.wallTop}, ${state.wallBottom})`);
+    document.documentElement.style.setProperty('--cols', state.cols);
+    $('#accent-color').value = state.accent;
+    $('#wall-top').value = state.wallTop;
+    $('#wall-bottom').value = state.wallBottom;
+    $('#cols-select').value = state.cols;
+  }
+
+  function iconEl(app, small){
+    const wrap = document.createElement('div');
+    wrap.className = 'app';
+    wrap.dataset.id = app.id;
+    wrap.innerHTML = `
+      <div class="remove">✕</div>
+      <div class="icon" style="--icon-bg:${app.color}1a; --icon-fg:${app.color}">${app.icon}</div>
+      ${small ? '' : `<div class="label">${app.name}</div>`}
+    `;
+    wrap.addEventListener('click', () => { if (!editMode) openApp(app); });
+    let pressTimer;
+    wrap.addEventListener('touchstart', () => { pressTimer = setTimeout(()=>enterEdit(), 500); }, {passive:true});
+    wrap.addEventListener('touchend', () => clearTimeout(pressTimer));
+    wrap.addEventListener('mousedown', () => { pressTimer = setTimeout(()=>enterEdit(), 500); });
+    wrap.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    wrap.querySelector('.remove').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      state.apps = state.apps.filter(a => a.id !== app.id);
+      saveState();
+      render();
+    });
+    if (editMode) wrap.classList.add('wiggle');
+    return wrap;
+  }
+
+  function enterEdit(){ editMode = true; render(); }
+  document.addEventListener('click', (e)=>{
+    if (editMode && !e.target.closest('.app')) { editMode = false; render(); }
+  });
+
+  function render(){
+    const grid = $('#grid');
+    grid.innerHTML = '';
+    state.apps.filter(a=>!a.dock).forEach(app => grid.appendChild(iconEl(app, false)));
+    if (editMode) {
+      const addTile = document.createElement('div');
+      addTile.className = 'app add-app';
+      addTile.innerHTML = `<div class="icon">+</div><div class="label">Add</div>`;
+      addTile.addEventListener('click', ()=>{ editMode=false; render(); openSettings(); });
+      grid.appendChild(addTile);
+    }
+    const dock = $('#dock');
+    dock.innerHTML = '';
+    state.apps.filter(a=>a.dock).forEach(app => dock.appendChild(iconEl(app, true)));
+    applyTheme();
+  }
+
+  function openApp(app){
+    $('#appview-title').textContent = app.name;
+    $('#appview-icon').textContent = app.icon;
+    $('#appview-icon').style.color = app.color;
+    $('#appview-body').innerHTML = `
+      <p>This is a placeholder screen for <strong>${app.name}</strong>.</p>
+      <p>Wire this up to real functionality as you build out G-phone — this simulator is a starting shell for prototyping Jewelry OS's app grid and screens.</p>
+    `;
+    $('#appview').classList.add('open');
+  }
+  $('#appview-close').addEventListener('click', ()=> $('#appview').classList.remove('open'));
+  $('#homebtn').addEventListener('click', ()=> $('#appview').classList.remove('open'));
+  $('#brandmark').addEventListener('click', ()=> $('#about').classList.add('open'));
+  $('#about').addEventListener('click', ()=> $('#about').classList.remove('open'));
+  $('#sensor').addEventListener('click', ()=> $('#lock').classList.add('closed'));
+  $('#lock').addEventListener('click', ()=> $('#lock').classList.remove('closed'));
+  $('#clock-link').addEventListener('click', () => {
+    const clockApp = state.apps.find(a => a.id === 'catalog') || state.apps[0];
+  });
+
+  // ---- Clock ----
+  function tick(){
+    const now = new Date();
+    const h = now.getHours() % 12 || 12;
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const str = `${h}:${m}`;
+    $('#clock-link').textContent = str;
+    $('#lock-clock').textContent = str;
+    const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    $('#lock-date').textContent = `${days[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}`;
+  }
+  tick();
+  setInterval(tick, 15000);
+
+  // ---- Settings drawer ----
+  function openSettings(){ $('#settings').classList.add('open'); }
+  $('#settings-toggle').addEventListener('click', openSettings);
+  $('#settings-close').addEventListener('click', ()=> $('#settings').classList.remove('open'));
+
+  $('#accent-color').addEventListener('input', e => { state.accent = e.target.value; saveState(); applyTheme(); });
+  $('#wall-top').addEventListener('input', e => { state.wallTop = e.target.value; saveState(); applyTheme(); });
+  $('#wall-bottom').addEventListener('input', e => { state.wallBottom = e.target.value; saveState(); applyTheme(); });
+  $('#cols-select').addEventListener('change', e => { state.cols = e.target.value; saveState(); applyTheme(); });
+
+  $('#add-app-btn').addEventListener('click', () => {
+    const name = $('#new-app-name').value.trim();
+    const icon = $('#new-app-icon').value.trim() || '✦';
+    if (!name) return;
+    state.apps.push({ id: 'app_' + Date.now(), name, icon, color: state.accent });
+    saveState();
+    $('#new-app-name').value = '';
+    $('#new-app-icon').value = '';
+    render();
+  });
+
+  $('#reset-btn').addEventListener('click', () => {
+    state = { apps: DEFAULT_APPS, accent:'#C6A15B', wallTop:'#F6F1E7', wallBottom:'#EFDCD6', cols:4 };
+    saveState();
+    render();
+  });
+
+  render();
+
+  // ---- PWA install prompt ----
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    $('#install-btn').style.display = 'block';
+    $('#install-hint').textContent = 'Tap below to install G-phone to your home screen.';
+  });
+  $('#install-btn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    $('#install-btn').style.display = 'none';
+  });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>
